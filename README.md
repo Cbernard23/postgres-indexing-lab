@@ -55,7 +55,7 @@ postgres-indexing-lab/
 ### 1️⃣ Clone the repo
 
 ```bash
-git clone https://github.com/<your-username>/postgres-indexing-lab.git
+git clone https://github.com/cbernard23/postgres-indexing-lab.git
 cd postgres-indexing-lab
 ```
 
@@ -156,13 +156,13 @@ Query#   Before(ms)      After(ms)       Speedup
 5        4.039           0.028           x144
 ```
 
-| # | Query | Before (ms) | After (ms) | Notes |
-| - | ----- | ----------- | ---------- | ----- |
-| 1 | Find user by email | 0.188 | 0.160 | Already covered by PostgreSQL’s automatic `users_email_key` unique index |
-| 2 | Orders by user_id | 46.395 | 0.264 | Benefit from `idx_orders_user_id` |
-| 3 | Pending orders (last 7 days) | 38.516 | 28.814 | Partial index `idx_orders_pending_recent` keeps scans tighter |
-| 4 | User’s recent orders (sorted DESC) | 23.266 | 0.009 | Composite index `idx_orders_user_created_at` avoids sort |
-| 5 | Lookup by notes | 4.039 | 0.028 | `idx_users_notes` turns the seq scan into an index scan |
+| #   | Query                              | Before (ms) | After (ms) | Notes                                                                    |
+| --- | ---------------------------------- | ----------- | ---------- | ------------------------------------------------------------------------ |
+| 1   | Find user by email                 | 0.188       | 0.160      | Already covered by PostgreSQL’s automatic `users_email_key` unique index |
+| 2   | Orders by user_id                  | 46.395      | 0.264      | Benefit from `idx_orders_user_id`                                        |
+| 3   | Pending orders (last 7 days)       | 38.516      | 28.814     | Partial index `idx_orders_pending_recent` keeps scans tighter            |
+| 4   | User’s recent orders (sorted DESC) | 23.266      | 0.009      | Composite index `idx_orders_user_created_at` avoids sort                 |
+| 5   | Lookup by notes                    | 4.039       | 0.028      | `idx_users_notes` turns the seq scan into an index scan                  |
 
 > PostgreSQL automatically creates indexes for every `PRIMARY KEY` and `UNIQUE` constraint. Because the runner leaves those intact, you’ll see two rows where the before/after numbers (and the `Speedup` column) are essentially the same—those queries are already using the auto-built indexes by design.
 
