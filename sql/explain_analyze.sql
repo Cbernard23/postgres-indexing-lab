@@ -48,9 +48,9 @@ ORDER BY created_at DESC
 LIMIT 10;
 
 -- -------------------------------
--- 5️⃣ Optional Custom Test
+-- 5️⃣ User Notes Lookup
 -- -------------------------------
-\echo '\n-- 🧩 Query 5: Test on non-indexed text column (users.notes)'
+\echo '\n-- 🧩 Query 5: Lookup by text column (users.notes)'
 
 EXPLAIN ANALYZE
 SELECT * FROM users WHERE notes = 'abc123';

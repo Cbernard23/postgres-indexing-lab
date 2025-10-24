@@ -1,8 +1,12 @@
 -- Generate 100,000 users
-INSERT INTO users (name, email)
+INSERT INTO users (name, email, notes)
 SELECT
   'User ' || i,
-  'user' || i || '@example.com'
+  'user' || i || '@example.com',
+  CASE
+    WHEN i = 50000 THEN 'abc123'
+    ELSE 'note ' || i
+  END
 FROM generate_series(1, 100000) AS s(i);
 
 -- Generate 1,000,000 orders
@@ -17,4 +21,3 @@ SELECT
   END,
   NOW() - (random() * interval '365 days')
 FROM generate_series(1, 1000000);
-
