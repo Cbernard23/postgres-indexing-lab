@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16
+    container_name: pg_indexing_lab
+    environment:
+      POSTGRES_USER: chris
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: indexing_lab
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+
