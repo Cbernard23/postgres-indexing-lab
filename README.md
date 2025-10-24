@@ -42,7 +42,9 @@ postgres-indexing-lab/
 │  └─ explain_analyze.sql     # Benchmark queries with EXPLAIN ANALYZE
 ├─ docker-compose.yml         # PostgreSQL container setup
 ├─ README.md                  # Documentation (this file)
-└─ run_all.sh                 # Optional script to execute all SQL in order
+├─ run_benchmark.sh           # Automates the before/after benchmark run
+├─ before_index.csv           # Runner output (Execution Time before indexes)
+└─ after_index.csv            # Runner output (Execution Time after indexes)
 
 ```
 
@@ -127,21 +129,52 @@ docker exec -i pg_indexing_lab psql -U chris -d indexing_lab -f /docker-entrypoi
 
 ## 🧮 Running Performance Tests
 
-To compare performance, use:
+### Automated runner (recommended)
 
-```sql
-EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'user9999@example.com';
+```bash
+chmod +x run_benchmark.sh   # only needed once
+./run_benchmark.sh
 ```
 
-Example results:
+The runner:
 
-| Query                          | Before Index | After Index | Improvement      |
-| ------------------------------ | ------------ | ----------- | ---------------- |
-| Find user by email             | 300 ms       | 0.3 ms      | 🔥 ~1000× faster |
-| Orders by user_id              | 250 ms       | 1 ms        | ~250× faster     |
-| Pending orders (partial index) | 200 ms       | 5 ms        | ~40× faster      |
+- ensures the `pg_indexing_lab` container is up (starting it if needed)
+- truncates and reloads the seed data
+- drops any non-Postgres-managed indexes (`_pkey` / `_key` stay in place)
+- captures `EXPLAIN ANALYZE` timing before and after applying the lab indexes
+- writes the raw timings to `before_index.csv` and `after_index.csv`
+- prints a side-by-side summary so you can spot the speedups quickly
 
-Add your own measurements here as you test.
+Sample summary:
+
+```text
+Query#   Before(ms)      After(ms)       Speedup
+1        0.188           0.160           x1
+2        46.395          0.264           x176
+3        38.516          28.814          x1
+4        23.266          0.009           x2585
+5        4.039           0.028           x144
+```
+
+| # | Query | Before (ms) | After (ms) | Notes |
+| - | ----- | ----------- | ---------- | ----- |
+| 1 | Find user by email | 0.188 | 0.160 | Already covered by PostgreSQL’s automatic `users_email_key` unique index |
+| 2 | Orders by user_id | 46.395 | 0.264 | Benefit from `idx_orders_user_id` |
+| 3 | Pending orders (last 7 days) | 38.516 | 28.814 | Partial index `idx_orders_pending_recent` keeps scans tighter |
+| 4 | User’s recent orders (sorted DESC) | 23.266 | 0.009 | Composite index `idx_orders_user_created_at` avoids sort |
+| 5 | Lookup by notes | 4.039 | 0.028 | `idx_users_notes` turns the seq scan into an index scan |
+
+> PostgreSQL automatically creates indexes for every `PRIMARY KEY` and `UNIQUE` constraint. Because the runner leaves those intact, you’ll see two rows where the before/after numbers (and the `Speedup` column) are essentially the same—those queries are already using the auto-built indexes by design.
+
+### Manual exploration
+
+If you prefer to poke around manually, run `EXPLAIN ANALYZE` inside psql:
+
+```sql
+EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'user50000@example.com';
+```
+
+Repeat the query before and after executing `sql/indexes.sql` to compare the plans.
 
 ---
 
@@ -235,6 +268,7 @@ docker exec -it pg_indexing_lab psql -U chris -d indexing_lab
 \i /docker-entrypoint-initdb.d/explain_analyze.sql
 
 # Compare results
+./run_benchmark.sh              # Automated before/after benchmark + CSV output
 ```
 
 My Results:
