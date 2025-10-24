@@ -53,7 +53,7 @@ echo
 # Step 2 — Run benchmarks BEFORE indexing
 echo "📊 Running queries BEFORE indexes..."
 docker exec -i $CONTAINER psql -U $DB_USER -d $DB_NAME -f $SQL_DIR/explain_analyze.sql \
-  | grep "Execution Time" | awk 'NR % 2 == 0' > before_index.csv
+  | grep "Execution Time" > before_index.csv
 echo "✅ Results saved to before_index.csv"
 echo
 
@@ -66,7 +66,7 @@ echo
 # Step 4 — Run benchmarks AFTER indexing
 echo "📊 Running queries AFTER indexes..."
 docker exec -i $CONTAINER psql -U $DB_USER -d $DB_NAME -f $SQL_DIR/explain_analyze.sql \
-  | grep "Execution Time" | awk 'NR % 2 == 0' > after_index.csv
+  | grep "Execution Time" > after_index.csv
 echo "✅ Results saved to after_index.csv"
 echo
 
@@ -107,4 +107,3 @@ echo
 echo "✅ Benchmark complete!"
 echo "Check before_index.csv and after_index.csv for raw EXPLAIN output."
 echo
-
