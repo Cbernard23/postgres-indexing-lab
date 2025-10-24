@@ -237,23 +237,6 @@ docker exec -it pg_indexing_lab psql -U chris -d indexing_lab
 # Compare results
 ```
 
----
-
-## 🧾 License
-
-MIT — free for educational and portfolio use.
-
----
-
-## ✨ Author
-
-**Chris Bernard**
-👩‍💻 Senior Software Engineer
-
-```
-github.com/cbernard23
-```
-
 My Results:
 
 I added a notes field to test with:
@@ -292,3 +275,20 @@ Execution Time: 0.056 ms
 (4 rows)
 
 So this index took the query time from 11.515ms down to 0.056ms which means the query with the index is 205x faster
+
+---
+
+## 🧾 License
+
+MIT — free for educational and portfolio use.
+
+---
+
+## ✨ Author
+
+**Chris Bernard**
+👩‍💻 Senior Software Engineer
+
+```
+github.com/cbernard23
+```
