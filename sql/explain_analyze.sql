@@ -5,7 +5,6 @@
 -- ============================================
 
 -- Clear the screen (psql-specific)
-\! clear
 
 \echo '============================================'
 \echo '🧠  Indexing Performance Benchmark Started...'
